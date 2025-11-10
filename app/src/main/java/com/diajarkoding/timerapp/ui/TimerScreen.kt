@@ -146,7 +146,8 @@ fun RunningScreen(
     onCancelClick: () -> Unit,
     onPauseToggleClick: () -> Unit
 ) {
-    Column {
+    Column(horizontalAlignment = Alignment.CenterHorizontally)
+    {
         Box(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.Center
