@@ -27,8 +27,10 @@ fun TimerPickerColumn(
     label: String,
     onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    defaultIndex: Int = 0
+    initialValue: String = "00"
 ) {
+    val defaultIndex = items.indexOf(initialValue).coerceAtLeast(0)
+
     val middleIndex = Int.MAX_VALUE / 2
     val remainder = middleIndex % items.size
     val initialIndex = middleIndex - remainder + defaultIndex

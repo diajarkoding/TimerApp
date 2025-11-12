@@ -12,6 +12,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TimerPicker(
     modifier: Modifier = Modifier,
+    initialHours: Int = 0,
+    initialMinutes: Int = 0,
+    initialSeconds: Int = 0,
     onHoursChange: (Int) -> Unit,
     onMinutesChange: (Int) -> Unit,
     onSecondsChange: (Int) -> Unit
@@ -30,18 +33,21 @@ fun TimerPicker(
         TimerPickerColumn(
             items = hoursList,
             label = "hours",
+            initialValue = hoursList.find { it.toInt() == initialHours } ?: "00",
             onValueChange = { onHoursChange(it) },
             modifier = Modifier.weight(1f)
         )
         TimerPickerColumn(
             items = minutesList,
             label = "min",
+            initialValue = minutesList.find { it.toInt() == initialMinutes } ?: "00",
             onValueChange = { onMinutesChange(it) },
             modifier = Modifier.weight(1f)
         )
         TimerPickerColumn(
             items = secondsList,
             label = "sec",
+            initialValue = secondsList.find { it.toInt() == initialSeconds } ?: "00",
             onValueChange = { onSecondsChange(it) },
             modifier = Modifier.weight(1f)
         )

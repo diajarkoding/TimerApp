@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,9 +35,9 @@ fun TimerScreen() {
     var isTimerRunning by remember { mutableStateOf(false) }
     var isPaused by remember { mutableStateOf(false) }
 
-    var selectedHours by remember { mutableStateOf(0) }
-    var selectedMinutes by remember { mutableStateOf(0) }
-    var selectedSeconds by remember { mutableStateOf(0) }
+    var selectedHours by rememberSaveable { mutableStateOf(0) }
+    var selectedMinutes by rememberSaveable { mutableStateOf(0) }
+    var selectedSeconds by rememberSaveable { mutableStateOf(0) }
 
     var totalTimeInMillis by remember { mutableStateOf(0L) }
     var remainingTimeInMillis by remember { mutableStateOf(0L) }
@@ -96,6 +97,9 @@ fun TimerScreen() {
                 )
             } else {
                 SettingScreen(
+                    initialHours = selectedHours,
+                    initialMinutes = selectedMinutes,
+                    initialSeconds = selectedSeconds,
                     onStartClick = {
                         val selectedTime = (selectedHours * 3600L + selectedMinutes * 60L + selectedSeconds) * 1000L
                         if (selectedTime > 0L) {
@@ -119,6 +123,9 @@ fun TimerScreen() {
 @Composable
 fun SettingScreen(
     onStartClick: () -> Unit,
+    initialHours: Int = 0,
+    initialMinutes: Int = 0,
+    initialSeconds: Int = 0,
     onHoursChange: (Int) -> Unit,
     onMinutesChange: (Int) -> Unit,
     onSecondsChange: (Int) -> Unit
@@ -129,6 +136,9 @@ fun SettingScreen(
             contentAlignment = Alignment.Center
         ) {
             TimerPicker(
+                initialHours = initialHours,
+                initialMinutes = initialMinutes,
+                initialSeconds = initialSeconds,
                 onHoursChange = onHoursChange,
                 onMinutesChange = onMinutesChange,
                 onSecondsChange = onSecondsChange
