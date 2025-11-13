@@ -1,5 +1,6 @@
 package com.diajarkoding.timerapp.ui.widget
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -24,7 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.concurrent.TimeUnit
+import kotlin.math.ceil
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun CircularCountdown(
     remainingTimeInMillis: Long,
@@ -38,9 +41,11 @@ fun CircularCountdown(
         label = "Sweep Angle"
     )
 
-    val remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(remainingTimeInMillis) % 60
-    val remainingMinutes = TimeUnit.MILLISECONDS.toMinutes(remainingTimeInMillis) % 60
-    val remainingHours = TimeUnit.MILLISECONDS.toHours(remainingTimeInMillis)
+    val totalDisplaySeconds = ceil(remainingTimeInMillis.toDouble() / 1000.0).toLong()
+
+    val remainingSeconds = totalDisplaySeconds % 60
+    val remainingMinutes = (totalDisplaySeconds % 3600) / 60
+    val remainingHours = totalDisplaySeconds / 3600
 
     val formattedTime = String.format(
         "%02d:%02d:%02d",
