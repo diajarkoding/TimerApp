@@ -1,5 +1,9 @@
 package com.diajarkoding.timerapp.ui
 
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.media.RingtoneManager
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
@@ -8,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,12 +49,53 @@ fun TimerScreen() {
     var remainingTimeInMillis by remember { mutableStateOf(0L) }
     var targetTime by remember { mutableStateOf(0L) }
 
+    val context = LocalContext.current
+    val mediaPlayer = remember(context) {
+        val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        Log.d("TimerAppDebug", "Timer URI: $uri")
+
+        var player: MediaPlayer? = null
+        val soundUri = uri ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+
+        if (soundUri != null) {
+            player = MediaPlayer.create(context, soundUri)
+            player?.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+        } else {
+            Log.e("TimerAppDebug", "Tidak dapat menemukan suara timer atau alarm default.")
+        }
+        player
+    }
+
+    DisposableEffect(mediaPlayer) {
+        onDispose {
+            Log.d("TimerAppDebug", "MediaPlayer dirilis.")
+            mediaPlayer?.release()
+        }
+    }
+
+    var played by remember(key1 = isTimerRunning) { mutableStateOf(false) }
+
     LaunchedEffect(key1 = isTimerRunning, key2 = isPaused) {
         if (isTimerRunning && !isPaused) {
             while (remainingTimeInMillis > 0) {
                 delay(10)
                 val newRemainingTime = (targetTime - System.currentTimeMillis()).coerceAtLeast(0L)
                 remainingTimeInMillis = newRemainingTime
+
+                if (newRemainingTime <= 1000 && !played) {
+                    Log.d("TimerAppDebug", "Memainkan suara 1s")
+                    mediaPlayer?.apply {
+                        setVolume(0.6f, 0.6f)
+                        seekTo(0) // Rewind
+                        start()
+                    }
+                    played = true
+                }
 
                 if (newRemainingTime <= 0L) {
                     isTimerRunning = false
